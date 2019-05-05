@@ -12,10 +12,13 @@ function get_attr() {
 }
 
 echo "Set IP"
+INSTANCE_NAME=`get_meta "v1/instance/name"`
 IP_ADDRESS=`get_meta "v1/instance/network-interfaces/0/access-configs/0/external-ip"`
-ZONE=`get_attr IP_ZONE`
-NAME=`get_attr IP_DNS_ADDRESS`
-PROJECT=`get_attr IP_PROJECT`
+DNS_NAME=`get_attr DNS_NAME`
+ZONE=`get_attr DNS_ZONE_NAME`
+
+NAME="$INSTANCE_NAME.$DNS_NAME"
+PROJECT=`get_attr DNS_PROJECT`
 OLDIP=`gcloud dns --project="$PROJECT" record-sets list -z $ZONE | grep $NAME | grep -oE '[^ ]+$'`
 echo "$PROJECT $ZONE $NAME $OLDIP $IP_ADDRESS"
 
