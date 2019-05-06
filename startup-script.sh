@@ -2,6 +2,7 @@
 
 set -ue
 
+################################################################
 # Basic Utility Methods.
 function get_meta() {
   curl --fail -s -H "Metadata-Flavor: Google" \
@@ -17,6 +18,7 @@ function get_attr() {
 }
 
 
+################################################################
 # Setup DNS record with the current IP address of this machine.
 echo "Updating DNS..."
 
@@ -47,11 +49,17 @@ if [ "$OLDIP" != "$IP_ADDRESS" ]; then
 fi
 
 
-# Update Packages
-# This is slow, we should only do this every week or so.
+################################################################
+# Update Packages. This is slow, we should only do this every week or so.
 echo "apt update and upgrade"
 apt update
 apt upgrade
+
+
+################################################################
+# Setup crontab to shutdown if gotosleep returns true.
+(crontab -l | grep -v gotosleep; \
+     echo "*/3 * * * * /root/gotosleep && /sbin/shutdown -h now") | crontab -
 
 
 echo "DONE"
