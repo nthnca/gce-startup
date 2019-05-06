@@ -2,6 +2,12 @@
 
 set -ue
 
+# Log everything to /var/log/messages, should make it easier to debug any problems.
+exec 1> >(logger -s -t $(basename $0)) 2>&1
+
+# HOME isn't set for startup script.
+export HOME=/root
+
 ################################################################
 # Basic Utility Methods.
 function get_meta() {
@@ -53,11 +59,12 @@ fi
 # Update Packages. This is slow, we should only do this every week or so.
 echo "apt update and upgrade"
 apt update
-apt upgrade
-
+apt upgrade -y
+apt install -y git-core less
 
 ################################################################
 # Setup crontab to shutdown if gotosleep returns true.
+echo "install crontab"
 (crontab -l | grep -v gotosleep; \
      echo "*/3 * * * * /root/gotosleep && /sbin/shutdown -h now") | crontab -
 
